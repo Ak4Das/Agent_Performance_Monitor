@@ -52,6 +52,12 @@
   flex-direction: column;
   border: none;
   background-color: #1f2a40;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.table_container::-webkit-scrollbar {
+  display: none;
 }
 
 .table td,
