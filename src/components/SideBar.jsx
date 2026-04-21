@@ -90,28 +90,30 @@ export default function SideBar() {
                       </div>
                     </li>
                   </Link>
-                  <li className={`${styles.navigation_section_item}`}>
-                    <div className={`${styles.navigation_item_container}`}>
-                      <span
-                        className={`${styles.navigation_item_icon_wrapper}`}
-                      >
+                  <Link className="text-decoration-none" to="/teamContact">
+                    <li className={`${styles.navigation_section_item}`}>
+                      <div className={`${styles.navigation_item_container}`}>
                         <span
-                          className={`${styles.navigation_item_icon_container}`}
+                          className={`${styles.navigation_item_icon_wrapper}`}
                         >
-                          <i
-                            className={`bi bi-person-rolodex ${styles.icon}`}
-                          ></i>
+                          <span
+                            className={`${styles.navigation_item_icon_container}`}
+                          >
+                            <i
+                              className={`bi bi-person-rolodex ${styles.icon}`}
+                            ></i>
+                          </span>
                         </span>
-                      </span>
-                      <span
-                        className={`${styles.navigation_item_content_wrapper}`}
-                      >
-                        <p className={`${styles.navigation_item_content}`}>
-                          Team Contact Info.
-                        </p>
-                      </span>
-                    </div>
-                  </li>
+                        <span
+                          className={`${styles.navigation_item_content_wrapper}`}
+                        >
+                          <p className={`${styles.navigation_item_content}`}>
+                            Team Contact Info.
+                          </p>
+                        </span>
+                      </div>
+                    </li>
+                  </Link>
                   <li className={`${styles.navigation_section_item}`}>
                     <div className={`${styles.navigation_item_container}`}>
                       <span

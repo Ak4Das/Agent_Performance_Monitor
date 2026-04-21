@@ -1,19 +1,43 @@
 import Chart from "chart.js/auto"
+import agents from "./data"
+
+const thirtyDaysPerformanceReport = agents.map((agent) => {
+  return {
+    id: agent.id,
+    name: agent.name.split(" ")[0],
+    score: Number(((agent.closed / agent.newLead) * 10).toFixed(1)),
+  }
+})
+
+const sixMonthsPerformanceReport = agents.map((agent) => {
+  return {
+    id: agent.id,
+    name: agent.name.split(" ")[0],
+    score: Number(
+      ((agent.closedUnderSixMonths / agent.leadsUnderSixMonths) * 10).toFixed(
+        1,
+      ),
+    ),
+  }
+})
+
+const oneYearPerformanceReport = agents.map((agent) => {
+  return {
+    id: agent.id,
+    name: agent.name.split(" ")[0],
+    score: Number(
+      ((agent.closedUnderOneYear / agent.leadsUnderOneYear) * 10).toFixed(1),
+    ),
+  }
+})
+
+const oneYearPerformanceScoresArr = oneYearPerformanceReport.map((a) => a.score)
+
+const maxIndex = oneYearPerformanceScoresArr.indexOf(
+  Math.max(...oneYearPerformanceScoresArr),
+)
 
 async function barChart() {
-  const data = [
-    { agent: "Agni", count: 9 },
-    { agent: "Alok", count: 7 },
-    { agent: "Akshay", count: 6 },
-    { agent: "Puja", count: 5 },
-    { agent: "Punam", count: 10 },
-    { agent: "Parag", count: 3 },
-    { agent: "Pankaj", count: 6 },
-    { agent: "Bibhushita", count: 5 },
-    { agent: "Chayan", count: 9 },
-    { agent: "Daya", count: 7 },
-  ]
-
   new Chart(document.getElementById("bar_chart"), {
     type: "bar",
     options: {
@@ -43,8 +67,17 @@ async function barChart() {
         },
         title: {
           display: true,
-          text: "30 days performance bar chart",
+          text: "30 days performance report (out of 10)",
           color: "#70d89d",
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              const point = context.raw
+
+              return ` ${point.y.toFixed(1)} _ ( ID : ${point.id} ) `
+            },
+          },
         },
       },
       responsive: true,
@@ -53,10 +86,14 @@ async function barChart() {
       animation: false,
     },
     data: {
-      labels: data.map((row) => row.agent),
+      labels: thirtyDaysPerformanceReport.map((row) => row.name),
       datasets: [
         {
-          data: data.map((row) => row.count),
+          data: thirtyDaysPerformanceReport.map((row) => ({
+            x: row.name,
+            y: row.score,
+            id: row.id,
+          })),
           backgroundColor: "#36A2EB",
           borderColor: "#36A2EB",
           borderWidth: 1,
@@ -69,19 +106,6 @@ async function barChart() {
 }
 
 async function lineChart() {
-  const data = [
-    { agent: "Agni", count: 90 },
-    { agent: "Alok", count: 70 },
-    { agent: "Akshay", count: 60 },
-    { agent: "Puja", count: 50 },
-    { agent: "Punam", count: 100 },
-    { agent: "Parag", count: 30 },
-    { agent: "Pankaj", count: 60 },
-    { agent: "Bibhushita", count: 50 },
-    { agent: "Chayan", count: 90 },
-    { agent: "Daya", count: 70 },
-  ]
-
   new Chart(document.getElementById("line_chart"), {
     type: "line",
     options: {
@@ -111,8 +135,17 @@ async function lineChart() {
         },
         title: {
           display: true,
-          text: "6 months performance line chart",
+          text: "6 months performance report (out of 10)",
           color: "#70d89d",
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              const point = context.raw
+
+              return ` ${point.y.toFixed(1)} _ ( ID : ${point.id} ) `
+            },
+          },
         },
       },
       responsive: true,
@@ -121,10 +154,14 @@ async function lineChart() {
       animation: false,
     },
     data: {
-      labels: data.map((row) => row.agent),
+      labels: sixMonthsPerformanceReport.map((row) => row.name),
       datasets: [
         {
-          data: data.map((row) => row.count),
+          data: sixMonthsPerformanceReport.map((row) => ({
+            x: row.name,
+            y: row.score,
+            id: row.id,
+          })),
           backgroundColor: "#36A2EB",
           borderColor: "#36A2EB",
         },
@@ -134,19 +171,6 @@ async function lineChart() {
 }
 
 async function pieChart() {
-  const data = [
-    { agent: "Agni", count: 450 },
-    { agent: "Alok", count: 420 },
-    { agent: "Akshay", count: 380 },
-    { agent: "Puja", count: 350 },
-    { agent: "Punam", count: 500 },
-    { agent: "Parag", count: 250 },
-    { agent: "Pankaj", count: 375 },
-    { agent: "Bibhushita", count: 350 },
-    { agent: "Chayan", count: 480 },
-    { agent: "Daya", count: 410 },
-  ]
-
   new Chart(document.getElementById("pie_chart"), {
     type: "pie",
     options: {
@@ -176,8 +200,20 @@ async function pieChart() {
         },
         title: {
           display: true,
-          text: "1 year performance pie chart",
+          text: "1 year performance report (out of  10)",
           color: "#70d89d",
+        },
+        tooltip: {
+          callbacks: {
+            label: function (context) {
+              const label = context.label
+              const value = context.raw
+
+              const id = context.dataset.ids[context.dataIndex]
+
+              return ` ${value} _ ( ID - ${id} ) `
+            },
+          },
         },
       },
       responsive: true,
@@ -186,22 +222,26 @@ async function pieChart() {
       animation: false,
     },
     data: {
-      labels: data.map((row) => row.agent),
+      labels: oneYearPerformanceReport.map((row) => row.name),
       datasets: [
         {
-          data: data.map((row) => row.count),
+          data: oneYearPerformanceReport.map((row) => row.score),
           backgroundColor: [
-            "#FF5733",
-            "#33FF57",
-            "#3357FF",
-            "#FF33A6",
-            "#FFBD33",
-            "#33FFF6",
-            "#FFC300",
-            "#C70039",
-            "#900C3F",
-            "#581845",
+            "#4CAF50",
+            "#2196F3",
+            "#FFC107",
+            "#FF5722",
+            "#9C27B0",
+            "#00BCD4",
+            "#8BC34A",
+            "#FF9800",
+            "#E91E63",
+            "#3F51B5",
           ],
+          ids: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          offset: oneYearPerformanceReport.map((_, i) =>
+            i === maxIndex ? 20 : 0,
+          ),
         },
       ],
     },

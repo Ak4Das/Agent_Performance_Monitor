@@ -7,10 +7,12 @@ import theme from "./themeProvider.js"
 
 import App from "./App.jsx"
 import Team from "./pages/Team.jsx"
+import TeamContactInfo from "./pages/TeamContactInfo.jsx"
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
   { path: "/team", element: <Team /> },
+  { path: "/teamContact", element: <TeamContactInfo /> },
 ])
 
 createRoot(document.getElementById("root")).render(

@@ -8,6 +8,13 @@ import { useTheme } from "styled-components"
 import SideBar from "./components/SideBar.jsx"
 import NavBar from "./components/NavBar.jsx"
 import { barChart, lineChart, pieChart } from "./chart.js"
+import agents from "./data.js"
+import { sortAgentsArrayByProperty } from "./functions.js"
+
+const sortAgentsByPerformanceScore = sortAgentsArrayByProperty(
+  agents,
+  "performanceScore",
+)
 
 function App() {
   const theme = useTheme()
@@ -71,77 +78,38 @@ function App() {
                 </div>
               </div>
               <div className={`${styles.agent_performance_table}`}>
-                <h6>30 days performance table</h6>
+                <h6>Agents overall performance table</h6>
                 <table className={`table ${styles.table}`}>
                   <thead>
                     <tr>
                       <th scope="col">id</th>
                       <th scope="col">Agent Name</th>
-                      <th scope="col">Lead No.</th>
-                      <th scope="col">Closed No.</th>
+                      <th scope="col">New Lead</th>
+                      <th scope="col">Closed</th>
+                      <th scope="col">Performance Score</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Rank</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <th scope="row">1</th>
-                      <td>Agni</td>
-                      <td>20</td>
-                      <td>9</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">2</th>
-                      <td>Alok</td>
-                      <td>25</td>
-                      <td>7</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">3</th>
-                      <td>Akshay</td>
-                      <td>15</td>
-                      <td>6</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">4</th>
-                      <td>Puja</td>
-                      <td>37</td>
-                      <td>5</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">5</th>
-                      <td>Punam</td>
-                      <td>32</td>
-                      <td>10</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">6</th>
-                      <td>Parag</td>
-                      <td>10</td>
-                      <td>3</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">7</th>
-                      <td>Pankaj</td>
-                      <td>16</td>
-                      <td>6</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">8</th>
-                      <td>Bibhushita</td>
-                      <td>19</td>
-                      <td>5</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">9</th>
-                      <td>Chayan</td>
-                      <td>29</td>
-                      <td>9</td>
-                    </tr>
-                    <tr>
-                      <th scope="row">10</th>
-                      <td>Daya</td>
-                      <td>12</td>
-                      <td>7</td>
-                    </tr>
+                    {sortAgentsByPerformanceScore.map((agent, index) => {
+                      return (
+                        <tr key={agent.id}>
+                          <th scope="row">{agent.id}</th>
+                          <td>{agent.name}</td>
+                          <td>{agent.newLead}</td>
+                          <td>{agent.closed}</td>
+                          <td>
+                            <span style={{ color: "#70d89d" }}>
+                              {agent.performanceScore.toFixed(1)}
+                            </span>{" "}
+                            out of 10
+                          </td>
+                          <td style={{ color: "#70d89d" }}>{agent.status}</td>
+                          <td>{index + 1}</td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
               </div>
