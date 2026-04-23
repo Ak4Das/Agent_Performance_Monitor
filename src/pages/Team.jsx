@@ -30,7 +30,12 @@ export default function Team() {
                 <h2 className={`${styles.text1}`}>Team</h2>
                 <h5 className={`${styles.text2}`}>The Team Members</h5>
               </div>
-              <Link to="/addAgent" className={`btn btn-outline-success ${styles.add_people_btn}`}>Add New Agent</Link>
+              <Link
+                to="/addAgent"
+                className={`btn btn-outline-success ${styles.add_people_btn}`}
+              >
+                Add New Agent
+              </Link>
             </div>
             <div className={`${styles.table_wrapper}`}>
               <div className={`${styles.table_container}`}>
@@ -413,9 +418,12 @@ export default function Team() {
                             out of 10
                           </td>
                           <td>
-                            <button className="btn btn-success btn-sm">
+                            <Link
+                              to={`/salesAgent/${agent.id}`}
+                              className="btn btn-success btn-sm"
+                            >
                               View Profile
-                            </button>
+                            </Link>
                           </td>
                         </tr>
                       )

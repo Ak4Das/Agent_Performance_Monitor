@@ -4,6 +4,7 @@ import NavBar from "../components/NavBar.jsx"
 import { useState } from "react"
 import agents from "../agentData.js"
 import { sortAgentsArrayByProperty } from "../functions.js"
+import { Link } from "react-router-dom"
 
 const sortAgentsByTotalSales = sortAgentsArrayByProperty(
   agents,
@@ -266,9 +267,12 @@ export default function SalesInfo() {
                           </td>
                           <td>{index + 1}</td>
                           <td>
-                            <button className="btn btn-success btn-sm">
+                            <Link
+                              to={`/salesAgent/${agent.id}`}
+                              className="btn btn-success btn-sm"
+                            >
                               View Profile
-                            </button>
+                            </Link>
                           </td>
                         </tr>
                       )

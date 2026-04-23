@@ -348,7 +348,7 @@ export default function AddLead() {
               ) : null}
             </div>
             <button type="submit" className="btn btn-success">
-              Create New Agent
+              Create New Lead
             </button>
           </form>
         </section>

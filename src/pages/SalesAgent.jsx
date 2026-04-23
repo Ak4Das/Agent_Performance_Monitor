@@ -1,11 +1,14 @@
-import styles from "../style_modules/page_modules/Team.module.css"
-import SideBar from "../components/SideBar.jsx"
+import styles from "../style_modules/page_modules/SalesAgent.module.css"
+import SideBar from "../components/SideBar"
 import NavBar from "../components/NavBar.jsx"
+import agents from "../agentData.js"
 import { useState } from "react"
 import leadsData from "../leadData.js"
-import { Link } from "react-router-dom"
+import { useParams } from "react-router-dom"
 
-export default function Leads() {
+export default function SalesAgent() {
+  const id = Number(useParams().id)
+  const agent = agents.find((agent) => agent.id === id)
   const [idBtnClicked, setIdBtnClick] = useState(false)
   const [nameBtnClicked, setNameBtnClick] = useState(false)
   const [sourceBtnClicked, setSourceBtnClick] = useState(false)
@@ -17,25 +20,62 @@ export default function Leads() {
   const [closedAtBtnClicked, setClosedAtBtnClick] = useState(false)
   const [openFilterInput, setOpenFilterInput] = useState("")
 
+  const leadsHandledByAgent = leadsData.filter(
+    (lead) => lead.salesAgent === agent.name,
+  )
+
   return (
-    <div>
-      <div className={`${styles.app}`}>
-        <SideBar />
-        <main className={`${styles.content}`}>
-          <NavBar />
-          <section className={`${styles.main_section}`}>
-            <div className={`${styles.heading_container}`}>
-              <div className={`${styles.heading}`}>
-                <h2 className={`${styles.text1}`}>Leads</h2>
-                <h5 className={`${styles.text2}`}>The Potential Customers</h5>
-              </div>
-              <Link
-                to="/addLead"
-                className={`btn btn-outline-success ${styles.add_people_btn}`}
-              >
-                Add New Lead
-              </Link>
+    <div className={`${styles.app}`}>
+      <SideBar />
+      <main className={`${styles.content}`}>
+        <NavBar />
+        <section className={`${styles.main_section}`}>
+          <section className={`${styles.child_section_one}`}>
+            <div className={`${styles.profile_image}`}></div>
+            <p>
+              Name: <span>{agent.name}</span>
+            </p>
+            <p>
+              Phone: <span>{agent.phoneNumber}</span>
+            </p>
+            <p>
+              Email: <span>{agent.email}</span>
+            </p>
+            <p>
+              Overall Score: <span>{agent.performanceScore}</span>
+            </p>
+          </section>
+          <section className={`${styles.child_section_two}`}>
+            <h6 style={{ color: "#44C9BD" }}>Performance In This Month</h6>
+            <div className={`${styles.table_container}`}>
+              <table className={`table ${styles.table}`}>
+                <thead>
+                  <tr>
+                    <th scope="col">New Lead</th>
+                    <th scope="col">Contacted</th>
+                    <th scope="col">Qualified</th>
+                    <th scope="col">Proposal Send</th>
+                    <th scope="col">closed</th>
+                    <th scope="col">Score</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th scope="row">{agent.newLead}</th>
+                    <td>{agent.contacted}</td>
+                    <td>{agent.qualified}</td>
+                    <td>{agent.proposalSend}</td>
+                    <td>{agent.closed}</td>
+                    <td style={{ color: "#44C9BD" }}>
+                      {Number(((agent.closed / agent.newLead) * 10).toFixed(1))}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
+          </section>
+          <section className={`${styles.child_section_three}`}>
+            <h6 style={{ color: "#44C9BD" }}>Leads Handle By Agent</h6>
             <div className={`${styles.table_wrapper}`}>
               <div className={`${styles.table_container}`}>
                 {openFilterInput && (
@@ -196,7 +236,9 @@ export default function Leads() {
                               </div>
                               <div
                                 className={`btn ${styles.button}`}
-                                onClick={() => setOpenFilterInput("Sales Agent")}
+                                onClick={() =>
+                                  setOpenFilterInput("Sales Agent")
+                                }
                               >
                                 Filter
                               </div>
@@ -233,9 +275,7 @@ export default function Leads() {
                               </div>
                               <div
                                 className={`btn ${styles.button}`}
-                                onClick={() =>
-                                  setOpenFilterInput("Status")
-                                }
+                                onClick={() => setOpenFilterInput("Status")}
                               >
                                 Filter
                               </div>
@@ -350,7 +390,9 @@ export default function Leads() {
                               </div>
                               <div
                                 className={`btn ${styles.button}`}
-                                onClick={() => setOpenFilterInput("Time To Close")}
+                                onClick={() =>
+                                  setOpenFilterInput("Time To Close")
+                                }
                               >
                                 Filter
                               </div>
@@ -405,7 +447,7 @@ export default function Leads() {
                     </tr>
                   </thead>
                   <tbody>
-                    {leadsData.map((lead) => {
+                    {leadsHandledByAgent.map((lead) => {
                       return (
                         <tr key={lead.id}>
                           <th scope="row">{lead.id}</th>
@@ -417,7 +459,11 @@ export default function Leads() {
                           <td>{lead.status}</td>
                           <td>{lead.tags}</td>
                           <td>{lead.priority}</td>
-                          <td>{lead.timeToClose ? `${lead.timeToClose} days` : "_"}</td>
+                          <td>
+                            {lead.timeToClose
+                              ? `${lead.timeToClose} days`
+                              : "_"}
+                          </td>
                           <td>{lead.closedAt ? lead.closedAt : "_"}</td>
                           <td>
                             <button className="btn btn-success btn-sm">
@@ -432,8 +478,8 @@ export default function Leads() {
               </div>
             </div>
           </section>
-        </main>
-      </div>
+        </section>
+      </main>
     </div>
   )
 }

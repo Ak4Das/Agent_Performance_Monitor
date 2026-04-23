@@ -3,6 +3,7 @@ import SideBar from "../components/SideBar.jsx"
 import NavBar from "../components/NavBar.jsx"
 import { useState } from "react"
 import agents from "../agentData.js"
+import { Link } from "react-router-dom"
 
 export default function TeamContactInfo() {
   const [idBtnClicked, setIdBtnClick] = useState(false)
@@ -262,9 +263,12 @@ export default function TeamContactInfo() {
                           <td style={{ color: "#70d89d" }}>{agent.email}</td>
                           <td>{agent.phoneNumber}</td>
                           <td>
-                            <button className="btn btn-success btn-sm">
+                            <Link
+                              to={`/salesAgent/${agent.id}`}
+                              className="btn btn-success btn-sm"
+                            >
                               View Profile
-                            </button>
+                            </Link>
                           </td>
                         </tr>
                       )
