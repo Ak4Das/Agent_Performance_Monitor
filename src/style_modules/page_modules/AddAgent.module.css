@@ -92,3 +92,7 @@ select:-webkit-autofill {
   font-size: 12px;
   position: absolute;
 }
+
+.custom-select__menu-list::-webkit-scrollbar {
+  display: none;
+}
