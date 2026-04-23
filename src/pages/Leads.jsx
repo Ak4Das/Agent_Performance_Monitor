@@ -78,7 +78,9 @@ export default function Leads() {
                           }}
                         >
                           {idBtnClicked && (
-                            <div className={`${tableStyles.filter_btn_container}`}>
+                            <div
+                              className={`${tableStyles.filter_btn_container}`}
+                            >
                               <div className={`btn ${tableStyles.button}`}>
                                 Unsort
                               </div>
@@ -109,7 +111,9 @@ export default function Leads() {
                           }}
                         >
                           {nameBtnClicked && (
-                            <div className={`${tableStyles.filter_btn_container}`}>
+                            <div
+                              className={`${tableStyles.filter_btn_container}`}
+                            >
                               <div className={`btn ${tableStyles.button}`}>
                                 Unsort
                               </div>
@@ -146,7 +150,9 @@ export default function Leads() {
                           }}
                         >
                           {sourceBtnClicked && (
-                            <div className={`${tableStyles.filter_btn_container}`}>
+                            <div
+                              className={`${tableStyles.filter_btn_container}`}
+                            >
                               <div className={`btn ${tableStyles.button}`}>
                                 Unsort
                               </div>
@@ -185,7 +191,9 @@ export default function Leads() {
                           }}
                         >
                           {salesAgentBtnClicked && (
-                            <div className={`${tableStyles.filter_btn_container}`}>
+                            <div
+                              className={`${tableStyles.filter_btn_container}`}
+                            >
                               <div className={`btn ${tableStyles.button}`}>
                                 Unsort
                               </div>
@@ -197,7 +205,9 @@ export default function Leads() {
                               </div>
                               <div
                                 className={`btn ${tableStyles.button}`}
-                                onClick={() => setOpenFilterInput("Sales Agent")}
+                                onClick={() =>
+                                  setOpenFilterInput("Sales Agent")
+                                }
                               >
                                 Filter
                               </div>
@@ -222,7 +232,9 @@ export default function Leads() {
                           }}
                         >
                           {statusBtnClicked && (
-                            <div className={`${tableStyles.filter_btn_container}`}>
+                            <div
+                              className={`${tableStyles.filter_btn_container}`}
+                            >
                               <div className={`btn ${tableStyles.button}`}>
                                 Unsort
                               </div>
@@ -234,9 +246,7 @@ export default function Leads() {
                               </div>
                               <div
                                 className={`btn ${tableStyles.button}`}
-                                onClick={() =>
-                                  setOpenFilterInput("Status")
-                                }
+                                onClick={() => setOpenFilterInput("Status")}
                               >
                                 Filter
                               </div>
@@ -351,7 +361,9 @@ export default function Leads() {
                               </div>
                               <div
                                 className={`btn ${tableStyles.button}`}
-                                onClick={() => setOpenFilterInput("Time To Close")}
+                                onClick={() =>
+                                  setOpenFilterInput("Time To Close")
+                                }
                               >
                                 Filter
                               </div>
@@ -418,12 +430,19 @@ export default function Leads() {
                           <td>{lead.status}</td>
                           <td>{lead.tags}</td>
                           <td>{lead.priority}</td>
-                          <td>{lead.timeToClose ? `${lead.timeToClose} days` : "_"}</td>
+                          <td>
+                            {lead.timeToClose
+                              ? `${lead.timeToClose} days`
+                              : "_"}
+                          </td>
                           <td>{lead.closedAt ? lead.closedAt : "_"}</td>
                           <td>
-                            <button className="btn btn-success btn-sm">
-                              View Profile
-                            </button>
+                            <Link
+                              to={`/lead/${lead.id}`}
+                              className="btn btn-success btn-sm"
+                            >
+                              Manage Lead
+                            </Link>
                           </td>
                         </tr>
                       )

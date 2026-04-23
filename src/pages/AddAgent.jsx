@@ -81,7 +81,7 @@ export default function AddAgent() {
             <h2 className={`${styles.text1}`}>Agent Form</h2>
             <h5 className={`${styles.text2}`}>Add New Team Member</h5>
           </div>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="container">
             <div className={`${formStyles.input_wrapper}`}>
               <label
                 htmlFor="name"

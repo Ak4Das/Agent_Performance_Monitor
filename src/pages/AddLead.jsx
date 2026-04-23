@@ -94,7 +94,7 @@ export default function AddLead() {
             <h2 className={`${styles.text1}`}>Lead Form</h2>
             <h5 className={`${styles.text2}`}>Add New Lead</h5>
           </div>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className="container">
             <div className={`${formStyles.input_wrapper}`}>
               <label
                 htmlFor="name"

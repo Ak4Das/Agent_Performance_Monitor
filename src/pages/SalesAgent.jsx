@@ -43,7 +43,7 @@ export default function SalesAgent() {
               Email: <span>{agent.email}</span>
             </p>
             <p>
-              Overall Score: <span>{agent.performanceScore}</span>
+              Overall Score: <span>{agent.performanceScore} / 10</span>
             </p>
           </section>
           <section className={`${styles.child_section_two}`}>
@@ -68,7 +68,7 @@ export default function SalesAgent() {
                     <td>{agent.proposalSend}</td>
                     <td>{agent.closed}</td>
                     <td style={{ color: "#44C9BD" }}>
-                      {Number(((agent.closed / agent.newLead) * 10).toFixed(1))}
+                      {Number(((agent.closed / agent.newLead) * 10).toFixed(1))} / 10
                     </td>
                   </tr>
                 </tbody>
