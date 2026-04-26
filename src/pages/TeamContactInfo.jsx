@@ -2,9 +2,9 @@ import styles from "../style_modules/page_modules/Team.module.css"
 import tableStyles from "../style_modules/component_modules/Table.module.css"
 import SideBar from "../components/SideBar.jsx"
 import NavBar from "../components/NavBar.jsx"
-import { useState } from "react"
-import agents from "../agentData.js"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
+import axios from "axios"
 
 export default function TeamContactInfo() {
   const [idBtnClicked, setIdBtnClick] = useState(false)
@@ -13,7 +13,98 @@ export default function TeamContactInfo() {
   const [countryBtnClicked, setCountryBtnClick] = useState(false)
   const [phoneNumberBtnClicked, setPhoneNumberBtnClick] = useState(false)
   const [emailBtnClicked, setEmailBtnClick] = useState(false)
+  const [salesAgents, setSalesAgents] = useState([])
+
   const [openFilterInput, setOpenFilterInput] = useState("")
+  const [properties, setProperties] = useState({})
+
+  function capitalizeFirstLetter(string) {
+    const String = string.trim()
+    const array = String.split(" ")
+    const updatedArray = array.map((word) => {
+      const result = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      return result
+    })
+    return updatedArray.join(" ")
+  }
+
+  async function handleClick() {
+    const inputField = document.querySelector("#input")
+    const inputValue = inputField.value
+    if (inputValue) {
+      let updatedInputValue
+      if (openFilterInput === "phoneNumber") {
+        updatedInputValue = inputValue
+      } else {
+        updatedInputValue = capitalizeFirstLetter(inputValue)
+      }
+
+      const updatedProperties = {
+        ...properties,
+      }
+
+      if (openFilterInput === "phoneNumber") {
+        updatedProperties[openFilterInput] = { $regex: updatedInputValue }
+      } else {
+        updatedProperties[openFilterInput] = updatedInputValue
+      }
+
+      const updatedPropertiesString = JSON.stringify(updatedProperties)
+
+      const response = await filterAgentsByProperties(updatedPropertiesString)
+
+      setSalesAgents(response.data)
+      setProperties(updatedProperties)
+    } else {
+      delete properties[openFilterInput]
+
+      const propertiesString = JSON.stringify(properties)
+
+      const response = await filterAgentsByProperties(propertiesString)
+      setSalesAgents(response.data)
+      setProperties(properties)
+    }
+  }
+
+  async function filterAgentsByProperties(filtersString) {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/agents/prop?filters=${encodeURIComponent(JSON.stringify(filtersString))}`,
+      )
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function getAgentData() {
+    try {
+      const response = await axios.get("http://localhost:3000/agents")
+      setSalesAgents(response.data)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function removePropertyFilter(property) {
+    delete properties[property]
+    const propertiesString = JSON.stringify(properties)
+    const response = await filterAgentsByProperties(propertiesString)
+    setSalesAgents(response.data)
+    setProperties(properties)
+  }
+
+  async function clearAllFilters() {
+    Object.keys(properties).forEach((key) => delete properties[key])
+    const propertiesString = JSON.stringify(properties)
+    const response = await filterAgentsByProperties(propertiesString)
+    setSalesAgents(response.data)
+    setProperties(properties)
+  }
+
+  useEffect(() => {
+    getAgentData()
+  }, [])
 
   return (
     <div>
@@ -22,9 +113,21 @@ export default function TeamContactInfo() {
         <main className={`content`}>
           <NavBar />
           <section className={`main_section`}>
-            <div className={`${styles.heading}`}>
-              <h2 className={`${styles.text1}`}>Contacts</h2>
-              <h5 className={`${styles.text2}`}>Team Contact Information's</h5>
+            <div className={`${styles.heading_container}`}>
+              <div className={`${styles.heading}`}>
+                <h2 className={`${styles.text1}`}>Contacts</h2>
+                <h5 className={`${styles.text2}`}>
+                  Team Contact Information's
+                </h5>
+              </div>
+              {Object.keys(properties).length !== 0 && (
+                <button
+                  className="btn btn-outline-danger"
+                  onClick={clearAllFilters}
+                >
+                  Clear All Filters
+                </button>
+              )}
             </div>
             <div className={`${tableStyles.table_wrapper}`}>
               <div className={`${tableStyles.table_container}`}>
@@ -41,6 +144,12 @@ export default function TeamContactInfo() {
                       className={`form-control ${tableStyles.input}`}
                       type="text"
                     />
+                    <button
+                      className="btn btn-success btn-sm mt-3"
+                      onClick={handleClick}
+                    >
+                      Apply
+                    </button>
                     <i
                       className={`bi bi-x-lg ${tableStyles.close}`}
                       onClick={() => setOpenFilterInput("")}
@@ -108,9 +217,15 @@ export default function TeamContactInfo() {
                               </div>
                               <div
                                 className={`btn ${tableStyles.button}`}
-                                onClick={() => setOpenFilterInput("Name")}
+                                onClick={() => setOpenFilterInput("name")}
                               >
                                 Filter
+                              </div>
+                              <div
+                                className={`btn text-danger ${tableStyles.button}`}
+                                onClick={() => removePropertyFilter("name")}
+                              >
+                                Remove Filter
                               </div>
                             </div>
                           )}
@@ -174,9 +289,15 @@ export default function TeamContactInfo() {
                               </div>
                               <div
                                 className={`btn ${tableStyles.button}`}
-                                onClick={() => setOpenFilterInput("Country")}
+                                onClick={() => setOpenFilterInput("country")}
                               >
                                 Filter
+                              </div>
+                              <div
+                                className={`btn text-danger ${tableStyles.button}`}
+                                onClick={() => removePropertyFilter("country")}
+                              >
+                                Remove Filter
                               </div>
                             </div>
                           )}
@@ -210,9 +331,15 @@ export default function TeamContactInfo() {
                               </div>
                               <div
                                 className={`btn ${tableStyles.button}`}
-                                onClick={() => setOpenFilterInput("Email")}
+                                onClick={() => setOpenFilterInput("email")}
                               >
                                 Filter
+                              </div>
+                              <div
+                                className={`btn text-danger ${tableStyles.button}`}
+                                onClick={() => removePropertyFilter("email")}
+                              >
+                                Remove Filter
                               </div>
                             </div>
                           )}
@@ -249,10 +376,18 @@ export default function TeamContactInfo() {
                               <div
                                 className={`btn ${tableStyles.button}`}
                                 onClick={() =>
-                                  setOpenFilterInput("Phone Number")
+                                  setOpenFilterInput("phoneNumberNormalized")
                                 }
                               >
                                 Filter
+                              </div>
+                              <div
+                                className={`btn text-danger ${tableStyles.button}`}
+                                onClick={() =>
+                                  removePropertyFilter("phoneNumberNormalized")
+                                }
+                              >
+                                Remove Filter
                               </div>
                             </div>
                           )}
@@ -264,26 +399,27 @@ export default function TeamContactInfo() {
                     </tr>
                   </thead>
                   <tbody>
-                    {agents.map((agent) => {
-                      return (
-                        <tr key={agent.id}>
-                          <th scope="row">{agent.id}</th>
-                          <td>{agent.name}</td>
-                          <td>{agent.age}</td>
-                          <td>{agent.country}</td>
-                          <td style={{ color: "#70d89d" }}>{agent.email}</td>
-                          <td>{agent.phoneNumber}</td>
-                          <td>
-                            <Link
-                              to={`/salesAgent/${agent.id}`}
-                              className="btn btn-success btn-sm"
-                            >
-                              View Profile
-                            </Link>
-                          </td>
-                        </tr>
-                      )
-                    })}
+                    {salesAgents &&
+                      salesAgents.map((agent) => {
+                        return (
+                          <tr key={agent.agentCode}>
+                            <th scope="row">{agent.agentCode}</th>
+                            <td>{agent.name}</td>
+                            <td>{agent.age}</td>
+                            <td>{agent.country}</td>
+                            <td style={{ color: "#70d89d" }}>{agent.email}</td>
+                            <td>{agent.phoneNumber}</td>
+                            <td>
+                              <Link
+                                to={`/salesAgent/${agent.id}`}
+                                className="btn btn-success btn-sm"
+                              >
+                                View Profile
+                              </Link>
+                            </td>
+                          </tr>
+                        )
+                      })}
                   </tbody>
                 </table>
               </div>
