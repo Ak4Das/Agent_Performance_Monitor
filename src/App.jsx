@@ -9,9 +9,9 @@ import SideBar from "./components/SideBar.jsx"
 import NavBar from "./components/NavBar.jsx"
 import { barChart, lineChart, pieChart } from "./chart.js"
 import agents from "./agentData.js"
-import { sortAgentsArrayByProperty } from "./functions.js"
+import { sortArrayByProperty } from "./functions.js"
 
-const sortAgentsByPerformanceScore = sortAgentsArrayByProperty(
+const sortAgentsByPerformanceScore = sortArrayByProperty(
   agents,
   "performanceScore",
 )

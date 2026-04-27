@@ -2,15 +2,10 @@ import styles from "../style_modules/page_modules/Team.module.css"
 import tableStyles from "../style_modules/component_modules/Table.module.css"
 import SideBar from "../components/SideBar.jsx"
 import NavBar from "../components/NavBar.jsx"
-import { useState } from "react"
-import agents from "../agentData.js"
-import { sortAgentsArrayByProperty } from "../functions.js"
+import { useEffect, useState } from "react"
+import { sortArrayByProperty } from "../functions.js"
 import { Link } from "react-router-dom"
-
-const sortAgentsByTotalSales = sortAgentsArrayByProperty(
-  agents,
-  "salesInThisMonth",
-)
+import axios from "axios"
 
 export default function SalesInfo() {
   const [idBtnClicked, setIdBtnClick] = useState(false)
@@ -19,7 +14,143 @@ export default function SalesInfo() {
   const [emailBtnClicked, setEmailBtnClick] = useState(false)
   const [totalSaleBtnClicked, setTotalSaleBtnClick] = useState(false)
   const [rankBtnClicked, setRankBtnClicked] = useState(false)
+  const [salesAgents, setSalesAgents] = useState([])
+  const [salesData, setSalesData] = useState([])
+
   const [openFilterInput, setOpenFilterInput] = useState("")
+  const [properties, setProperties] = useState({})
+
+  const sortAgentsByTotalSales = sortArrayByProperty(
+    salesData,
+    "purchaseAmount",
+  )
+
+  function capitalizeFirstLetter(string) {
+    const String = string.trim()
+    const array = String.split(" ")
+    const updatedArray = array.map((word) => {
+      const result = word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+      return result
+    })
+    return updatedArray.join(" ")
+  }
+
+  async function handleClick() {
+    const inputField = document.querySelector("#input")
+    const inputValue = inputField.value
+    if (inputValue) {
+      let updatedInputValue
+      if (openFilterInput === "phoneNumber") {
+        updatedInputValue = inputValue
+      } else {
+        updatedInputValue = capitalizeFirstLetter(inputValue)
+      }
+
+      const updatedProperties = {
+        ...properties,
+      }
+
+      if (openFilterInput === "phoneNumber") {
+        updatedProperties[openFilterInput] = { $regex: updatedInputValue }
+      } else {
+        updatedProperties[openFilterInput] = updatedInputValue
+      }
+
+      const updatedPropertiesString = JSON.stringify(updatedProperties)
+
+      const response = await filterAgentsByProperties(updatedPropertiesString)
+
+      getUpdatedAgentsArray(response.data)
+      setProperties(updatedProperties)
+    } else {
+      delete properties[openFilterInput]
+
+      const propertiesString = JSON.stringify(properties)
+
+      const response = await filterAgentsByProperties(propertiesString)
+      getUpdatedAgentsArray(response.data)
+      setProperties(properties)
+    }
+  }
+
+  async function filterAgentsByProperties(filtersString) {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/agents/prop?filters=${encodeURIComponent(JSON.stringify(filtersString))}`,
+      )
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function getAgentData() {
+    try {
+      const response = await axios.get("http://localhost:3000/agents")
+      setSalesAgents(response.data)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function getSalesDataInThisMonth() {
+    try {
+      const response = await axios.get(
+        "http://localhost:3000/sales/prop?minDay=0&maxDay=30",
+      )
+      setSalesData(response.data)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function removePropertyFilter(property) {
+    delete properties[property]
+    const propertiesString = JSON.stringify(properties)
+    const response = await filterAgentsByProperties(propertiesString)
+    getUpdatedAgentsArray(response.data)
+    setProperties(properties)
+  }
+
+  async function clearAllFilters() {
+    Object.keys(properties).forEach((key) => delete properties[key])
+    const propertiesString = JSON.stringify(properties)
+    const response = await filterAgentsByProperties(propertiesString)
+    getUpdatedAgentsArray(response.data)
+    setProperties(properties)
+  }
+
+  useEffect(() => {
+    getAgentData()
+    getSalesDataInThisMonth()
+  }, [])
+
+  function getTotalSalesAmountOfAAgent(id) {
+    const arrayOfSalesDoneByAgent = salesData.filter(
+      (sales) => sales.salesAgent === id,
+    )
+    const totalSales = arrayOfSalesDoneByAgent.reduce((acc, curr) => {
+      return acc + curr.purchaseAmount
+    }, 0)
+    return totalSales
+  }
+
+  function getUpdatedAgentsArray(salesAgents) {
+    const updatedArray = salesAgents.map((agent) => {
+      const totalSaleDoneByTheAgent = getTotalSalesAmountOfAAgent(agent._id)
+      agent.totalSalesDoneInBtw30Days = totalSaleDoneByTheAgent
+      return agent
+    })
+    const SortBySalesDoneInBtw30Days = sortArrayByProperty(
+      updatedArray,
+      "totalSalesDoneInBtw30Days",
+    )
+    setSalesAgents(SortBySalesDoneInBtw30Days)
+  }
+
+  useEffect(() => {
+    salesData.length && getUpdatedAgentsArray(salesAgents)
+  }, [salesData])
 
   return (
     <div>
@@ -28,9 +159,19 @@ export default function SalesInfo() {
         <main className={`content`}>
           <NavBar />
           <section className={`main_section`}>
-            <div className={`${styles.heading}`}>
-              <h2 className={`${styles.text1}`}>Sales</h2>
-              <h5 className={`${styles.text2}`}>Sales In This Month</h5>
+            <div className={`${styles.heading_container}`}>
+              <div className={`${styles.heading}`}>
+                <h2 className={`${styles.text1}`}>Sales</h2>
+                <h5 className={`${styles.text2}`}>Sales In This Month</h5>
+              </div>
+              {Object.keys(properties).length !== 0 && (
+                <button
+                  className="btn btn-outline-danger"
+                  onClick={clearAllFilters}
+                >
+                  Clear All Filters
+                </button>
+              )}
             </div>
             <div className={`${tableStyles.table_wrapper}`}>
               <div className={`${tableStyles.table_container}`}>
@@ -47,6 +188,12 @@ export default function SalesInfo() {
                       className={`form-control ${tableStyles.input}`}
                       type="text"
                     />
+                    <button
+                      className="btn btn-success btn-sm mt-3"
+                      onClick={handleClick}
+                    >
+                      Apply
+                    </button>
                     <i
                       className={`bi bi-x-lg ${tableStyles.close}`}
                       onClick={() => setOpenFilterInput("")}
@@ -70,7 +217,9 @@ export default function SalesInfo() {
                           }}
                         >
                           {idBtnClicked && (
-                            <div className={`${tableStyles.filter_btn_container}`}>
+                            <div
+                              className={`${tableStyles.filter_btn_container}`}
+                            >
                               <div className={`btn ${tableStyles.button}`}>
                                 Unsort
                               </div>
@@ -98,7 +247,9 @@ export default function SalesInfo() {
                           }}
                         >
                           {nameBtnClicked && (
-                            <div className={`${tableStyles.filter_btn_container}`}>
+                            <div
+                              className={`${tableStyles.filter_btn_container}`}
+                            >
                               <div className={`btn ${tableStyles.button}`}>
                                 Unsort
                               </div>
@@ -110,9 +261,15 @@ export default function SalesInfo() {
                               </div>
                               <div
                                 className={`btn ${tableStyles.button}`}
-                                onClick={() => setOpenFilterInput("Name")}
+                                onClick={() => setOpenFilterInput("name")}
                               >
                                 Filter
+                              </div>
+                              <div
+                                className={`btn text-danger ${tableStyles.button}`}
+                                onClick={() => removePropertyFilter("name")}
+                              >
+                                Remove Filter
                               </div>
                             </div>
                           )}
@@ -146,9 +303,15 @@ export default function SalesInfo() {
                               </div>
                               <div
                                 className={`btn ${tableStyles.button}`}
-                                onClick={() => setOpenFilterInput("Email")}
+                                onClick={() => setOpenFilterInput("email")}
                               >
                                 Filter
+                              </div>
+                              <div
+                                className={`btn text-danger ${tableStyles.button}`}
+                                onClick={() => removePropertyFilter("email")}
+                              >
+                                Remove Filter
                               </div>
                             </div>
                           )}
@@ -170,7 +333,9 @@ export default function SalesInfo() {
                           }}
                         >
                           {phoneNumberBtnClicked && (
-                            <div className={`${tableStyles.filter_btn_container}`}>
+                            <div
+                              className={`${tableStyles.filter_btn_container}`}
+                            >
                               <div className={`btn ${tableStyles.button}`}>
                                 Unsort
                               </div>
@@ -183,10 +348,18 @@ export default function SalesInfo() {
                               <div
                                 className={`btn ${tableStyles.button}`}
                                 onClick={() =>
-                                  setOpenFilterInput("Phone Number")
+                                  setOpenFilterInput("phoneNumber")
                                 }
                               >
                                 Filter
+                              </div>
+                              <div
+                                className={`btn text-danger ${tableStyles.button}`}
+                                onClick={() =>
+                                  removePropertyFilter("phoneNumber")
+                                }
+                              >
+                                Remove Filter
                               </div>
                             </div>
                           )}
@@ -208,7 +381,9 @@ export default function SalesInfo() {
                           }}
                         >
                           {totalSaleBtnClicked && (
-                            <div className={`${tableStyles.filter_btn_container}`}>
+                            <div
+                              className={`${tableStyles.filter_btn_container}`}
+                            >
                               <div className={`btn ${tableStyles.button}`}>
                                 Unsort
                               </div>
@@ -236,7 +411,9 @@ export default function SalesInfo() {
                           }}
                         >
                           {rankBtnClicked && (
-                            <div className={`${tableStyles.filter_btn_container}`}>
+                            <div
+                              className={`${tableStyles.filter_btn_container}`}
+                            >
                               <div className={`btn ${tableStyles.button}`}>
                                 Unsort
                               </div>
@@ -256,28 +433,29 @@ export default function SalesInfo() {
                     </tr>
                   </thead>
                   <tbody>
-                    {sortAgentsByTotalSales.map((agent, index) => {
-                      return (
-                        <tr key={agent.id}>
-                          <th scope="row">{agent.id}</th>
-                          <td>{agent.name}</td>
-                          <td style={{ color: "#70d89d" }}>{agent.email}</td>
-                          <td>{agent.phoneNumber}</td>
-                          <td style={{ color: "#70d89d" }}>
-                            ${agent.salesInThisMonth}
-                          </td>
-                          <td>{index + 1}</td>
-                          <td>
-                            <Link
-                              to={`/salesAgent/${agent.id}`}
-                              className="btn btn-success btn-sm"
-                            >
-                              View Profile
-                            </Link>
-                          </td>
-                        </tr>
-                      )
-                    })}
+                    {salesAgents &&
+                      salesAgents.map((agent, index) => {
+                        return (
+                          <tr key={agent.agentCode}>
+                            <th scope="row">{agent.agentCode}</th>
+                            <td>{agent.name}</td>
+                            <td style={{ color: "#70d89d" }}>{agent.email}</td>
+                            <td>{agent.phoneNumber}</td>
+                            <td style={{ color: "#70d89d" }}>
+                              ${agent.totalSalesDoneInBtw30Days}
+                            </td>
+                            <td>{index + 1}</td>
+                            <td>
+                              <Link
+                                to={`/salesAgent/${agent.id}`}
+                                className="btn btn-success btn-sm"
+                              >
+                                View Profile
+                              </Link>
+                            </td>
+                          </tr>
+                        )
+                      })}
                   </tbody>
                 </table>
               </div>

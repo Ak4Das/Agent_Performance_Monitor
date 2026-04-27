@@ -98,7 +98,7 @@ export function sortArrayOfPhoneNumbersInDescendingOrder(arr) {
   return arr
 }
 
-export function sortAgentsArrayByProperty(arr, prop) {
+export function sortArrayByProperty(arr, prop) {
   const newArr = [...arr]
   for (let i = 0; i < newArr.length; ) {
     for (let j = i + 1; j < newArr.length; j++) {
