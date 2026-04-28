@@ -1,7 +1,3 @@
-.heading {
-  margin-bottom: 30px;
-}
-
 .heading .text1 {
   font-size: 32px;
   line-height: 1.2;
@@ -24,6 +20,11 @@
   align-items: center;
 }
 
+.heading_container button {
+  border: 1px solid #70d8bd;
+  color: #70d8bd;
+}
+
 .container p {
   color: #70d8bd;
 }
@@ -40,10 +41,11 @@
 
 .leadDetailsContainer {
   text-align: center;
+  margin-top: 50px;
 }
 
 .comment_section {
-  margin-top: 50px;
+  margin-top: 100px;
 }
 
 .previous_comments_section h3 {
@@ -88,6 +90,6 @@
 
 .add_comment_section button {
   background: #70d8bd;
-  color:#111111;
+  color: #111111;
   font-weight: 600;
 }

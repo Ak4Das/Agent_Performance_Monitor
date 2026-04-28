@@ -780,7 +780,7 @@ export default function Leads() {
                             <td>{lead.closedAt ? lead.closedAt : "_"}</td>
                             <td>
                               <Link
-                                to={`/lead/${lead.id}`}
+                                to={`/lead/${lead._id}`}
                                 className="btn btn-success btn-sm"
                               >
                                 Manage Lead
