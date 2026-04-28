@@ -14,6 +14,7 @@ import Leads from "./pages/Leads.jsx"
 import AddLead from "./pages/AddLead.jsx"
 import SalesAgent from "./pages/SalesAgent.jsx"
 import LeadManagement from "./pages/LeadManagement.jsx"
+import { ToastContainer } from 'react-toastify';
 
 const router = createBrowserRouter([
   { path: "/", element: <App /> },
@@ -31,6 +32,7 @@ createRoot(document.getElementById("root")).render(
   <ThemeProvider theme={theme}>
     <StrictMode>
       <RouterProvider router={router} />
+      <ToastContainer />
     </StrictMode>
   </ThemeProvider>,
 )

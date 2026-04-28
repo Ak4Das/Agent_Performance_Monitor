@@ -4,7 +4,13 @@ export const addAgentSchema = yup.object({
   name: yup.string().required("Please enter your name"),
   age: yup.number().min(18).max(50).required("Please enter your age"),
   country: yup.string().required("Please enter your country"),
-  phone: yup.string().required("Please enter your phone number"),
+  phoneNumber: yup
+    .string()
+    .required("Phone number is required")
+    .matches(
+      /^\(\+\d{1,3}\)\d{10}$/,
+      "Phone number must be in format (+91)9785578985",
+    ),
   email: yup.string().email().required("Please enter your email"),
   address: yup.string().required("Please enter your address"),
   profileImage: yup.string().required("Please enter your profile image"),

@@ -14,6 +14,8 @@ import {
   priorityOptions,
 } from "../reactSelectOptions.js"
 import { customStyles } from "../reactSelectCustomStyles.js"
+import axios from "axios"
+import { toast } from "react-toastify"
 
 export default function AddLead() {
   const [nameInputClicked, setNameInputClick] = useState(false)
@@ -33,14 +35,45 @@ export default function AddLead() {
     tags: "",
     timeToClose: "",
     priority: "",
-    phone: "",
+    phoneNumber: "",
+  }
+
+  function generateLeadId() {
+    const prefix = "LD"
+    const time = Date.now().toString().slice(-4)
+    const random = Math.floor(100000 + Math.random() * 900000)
+
+    return `${prefix}-${time}${random}`
+  }
+
+  function getCurrentDate() {
+    const currentDate = new Date().toISOString().split("T")[0]
+    return currentDate
+  }
+
+  async function createUser(body) {
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/leads/addLead",
+        body,
+      )
+
+      return response.data
+    } catch (error) {
+      throw error
+    }
   }
 
   const formik = useFormik({
     initialValues: initialValues,
     validationSchema: addLeadSchema,
-    onSubmit: (values, action) => {
-      console.log(values)
+    onSubmit: async (values, action) => {
+      values.leadCode = generateLeadId()
+      values.createdAt = getCurrentDate()
+      const response = await createUser(values)
+      if (response && Object.keys(response).length) {
+        toast("Lead Created Successfully👍")
+      }
       action.resetForm()
     },
   })
@@ -79,8 +112,8 @@ export default function AddLead() {
       const priority = document.querySelector("[name = 'priority']")
       !priority.value && setPriorityInputClick(false)
 
-      const phone = document.querySelector("[name = 'phone']")
-      !phone.value && setPhoneInputClick(false)
+      const phoneNumber = document.querySelector("[name = 'phoneNumber']")
+      !phoneNumber.value && setPhoneInputClick(false)
     })
   }, [])
 
@@ -338,7 +371,7 @@ export default function AddLead() {
             </div>
             <div className={`${formStyles.input_wrapper}`}>
               <label
-                htmlFor="phone"
+                htmlFor="phoneNumber"
                 className={`${phoneInputClicked && formStyles.input_clicked}`}
               >
                 Phone Number
@@ -346,21 +379,21 @@ export default function AddLead() {
               <input
                 type="text"
                 autoComplete="off"
-                name="phone"
-                id="phone"
+                name="phoneNumber"
+                id="phoneNumber"
                 onClick={(e) => {
                   e.stopPropagation()
                   setPhoneInputClick(true)
                 }}
-                value={values.phone}
+                value={values.phoneNumber}
                 onChange={handleChange}
                 onBlur={handleBlur}
               />
-              {errors.phone && touched.phone ? (
+              {errors.phoneNumber && touched.phoneNumber ? (
                 <span
                   className={`text-danger ${formStyles.show_validation_error}`}
                 >
-                  {errors.phone}
+                  {errors.phoneNumber}
                 </span>
               ) : null}
             </div>
