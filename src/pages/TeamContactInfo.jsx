@@ -14,12 +14,14 @@ import {
   sortArrayOfPhoneNumbersInDescendingOrder,
   sortArrayOfStringsInAscendingOrder,
   sortArrayOfStringsInDescendingOrder,
+  sortDateInAscOrder,
+  sortDateInDescOrder,
 } from "../functions.js"
 
 export default function TeamContactInfo() {
   const [idBtnClicked, setIdBtnClick] = useState(false)
   const [nameBtnClicked, setNameBtnClick] = useState(false)
-  const [ageBtnClicked, setAgeBtnClick] = useState(false)
+  const [dateOfBirthBtnClicked, setDateOfBirthBtnClick] = useState(false)
   const [countryBtnClicked, setCountryBtnClick] = useState(false)
   const [phoneNumberBtnClicked, setPhoneNumberBtnClick] = useState(false)
   const [emailBtnClicked, setEmailBtnClick] = useState(false)
@@ -124,11 +126,8 @@ export default function TeamContactInfo() {
         prop,
       )
       setSalesAgents(updatedAgentsData)
-    } else if (prop === "age") {
-      const updatedAgentsData = sortArrayOfNumbersInAscendingOrder(
-        salesAgents,
-        prop,
-      )
+    } else if (prop === "dateOfBirth") {
+      const updatedAgentsData = sortDateInAscOrder(salesAgents, prop)
       setSalesAgents(updatedAgentsData)
     } else if (prop === "phoneNumber") {
       const updatedAgentsData = sortArrayOfPhoneNumbersInAscendingOrder(
@@ -152,11 +151,8 @@ export default function TeamContactInfo() {
         prop,
       )
       setSalesAgents(updatedAgentsData)
-    } else if (prop === "age") {
-      const updatedAgentsData = sortArrayOfNumbersInDescendingOrder(
-        salesAgents,
-        prop,
-      )
+    } else if (prop === "dateOfBirth") {
+      const updatedAgentsData = sortDateInDescOrder(salesAgents, prop)
       setSalesAgents(updatedAgentsData)
     } else if (prop === "phoneNumber") {
       const updatedAgentsData = sortArrayOfPhoneNumbersInDescendingOrder(
@@ -250,7 +246,7 @@ export default function TeamContactInfo() {
                           onClick={() => {
                             setIdBtnClick(idBtnClicked ? false : true)
                             setNameBtnClick(false)
-                            setAgeBtnClick(false)
+                            setDateOfBirthBtnClick(false)
                             setCountryBtnClick(false)
                             setPhoneNumberBtnClick(false)
                             setEmailBtnClick(false)
@@ -289,7 +285,7 @@ export default function TeamContactInfo() {
                           onClick={() => {
                             setIdBtnClick(false)
                             setNameBtnClick(nameBtnClicked ? false : true)
-                            setAgeBtnClick(false)
+                            setDateOfBirthBtnClick(false)
                             setCountryBtnClick(false)
                             setPhoneNumberBtnClick(false)
                             setEmailBtnClick(false)
@@ -334,26 +330,28 @@ export default function TeamContactInfo() {
                         </i>
                       </th>
                       <th className={`${tableStyles.col}`} scope="col">
-                        <span>Age</span>
+                        <span>Date Of Birth</span>
                         <i
                           className="bi bi-three-dots-vertical"
                           onClick={() => {
                             setIdBtnClick(false)
                             setNameBtnClick(false)
-                            setAgeBtnClick(ageBtnClicked ? false : true)
+                            setDateOfBirthBtnClick(
+                              dateOfBirthBtnClicked ? false : true,
+                            )
                             setCountryBtnClick(false)
                             setPhoneNumberBtnClick(false)
                             setEmailBtnClick(false)
                           }}
                         >
-                          {ageBtnClicked && (
+                          {dateOfBirthBtnClicked && (
                             <div
                               className={`${tableStyles.filter_btn_container}`}
                             >
                               <div
                                 className={`btn ${tableStyles.button}`}
                                 onClick={() => {
-                                  sortAgentsDataInAscOrderByProp("age")
+                                  sortAgentsDataInAscOrderByProp("dateOfBirth")
                                   applySort(true)
                                 }}
                               >
@@ -362,7 +360,7 @@ export default function TeamContactInfo() {
                               <div
                                 className={`btn ${tableStyles.button}`}
                                 onClick={() => {
-                                  sortAgentsDataInDescOrderByProp("age")
+                                  sortAgentsDataInDescOrderByProp("dateOfBirth")
                                   applySort(true)
                                 }}
                               >
@@ -379,7 +377,7 @@ export default function TeamContactInfo() {
                           onClick={() => {
                             setIdBtnClick(false)
                             setNameBtnClick(false)
-                            setAgeBtnClick(false)
+                            setDateOfBirthBtnClick(false)
                             setCountryBtnClick(countryBtnClicked ? false : true)
                             setPhoneNumberBtnClick(false)
                             setEmailBtnClick(false)
@@ -430,7 +428,7 @@ export default function TeamContactInfo() {
                           onClick={() => {
                             setIdBtnClick(false)
                             setNameBtnClick(false)
-                            setAgeBtnClick(false)
+                            setDateOfBirthBtnClick(false)
                             setCountryBtnClick(false)
                             setPhoneNumberBtnClick(false)
                             setEmailBtnClick(emailBtnClicked ? false : true)
@@ -481,7 +479,7 @@ export default function TeamContactInfo() {
                           onClick={() => {
                             setIdBtnClick(false)
                             setNameBtnClick(false)
-                            setAgeBtnClick(false)
+                            setDateOfBirthBtnClick(false)
                             setCountryBtnClick(false)
                             setPhoneNumberBtnClick(
                               phoneNumberBtnClicked ? false : true,
@@ -543,7 +541,7 @@ export default function TeamContactInfo() {
                           <tr key={agent.agentCode}>
                             <th scope="row">{agent.agentCode}</th>
                             <td>{agent.name}</td>
-                            <td>{agent.age}</td>
+                            <td>{agent.dateOfBirth}</td>
                             <td>{agent.country}</td>
                             <td style={{ color: "#70d89d" }}>{agent.email}</td>
                             <td>{agent.phoneNumber}</td>

@@ -11,18 +11,12 @@ export const sourceOptions = [
   { value: "Others", label: "Others" },
 ]
 
-export const agentOptions = [
-  { value: "69eb0ef758d2e0a67af96618", label: "Agni Dey" },
-  { value: "69eb0ef758d2e0a67af96619", label: "Bipin Kumar" },
-  { value: "69eb0ef758d2e0a67af9661a", label: "Suraj Karmakar" },
-  { value: "69eb0ef758d2e0a67af9661b", label: "Jay Choudhary" },
-  { value: "69eb0ef758d2e0a67af9661c", label: "Punam Das" },
-  { value: "69eb0ef758d2e0a67af9661d", label: "Yash Coube" },
-  { value: "69eb0ef758d2e0a67af9661e", label: "Harsh Chatterjee" },
-  { value: "69eb0ef758d2e0a67af9661f", label: "Bibhushita Mondal" },
-  { value: "69eb0ef758d2e0a67af96620", label: "Chayan Das" },
-  { value: "69eb0ef758d2e0a67af96621", label: "Daya Pathak" },
-]
+export function getAgentOptions(agents) {
+  const options = agents.map((agent) => {
+    return { value: agent._id, label: agent.name }
+  })
+  return options
+}
 
 export const statusOptions = [
   { value: "New", label: "New" },

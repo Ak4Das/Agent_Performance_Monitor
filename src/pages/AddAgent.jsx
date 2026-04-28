@@ -79,31 +79,34 @@ export default function AddAgent() {
   const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
     formik
 
+  function eventHandlerOnDocument() {
+    const name = document.querySelector("[name = 'name']")
+    !name.value && setNameInputClick(false)
+
+    const country = document.querySelector("[name = 'country']")
+    !country.value && setCountryInputClick(false)
+
+    const phoneNumber = document.querySelector("[name = 'phoneNumber']")
+    !phoneNumber.value && setPhoneNumberInputClick(false)
+
+    const email = document.querySelector("[name = 'email']")
+    !email.value && setEmailInputClick(false)
+
+    const address = document.querySelector("[name = 'address']")
+    !address.value && setAddressInputClick(false)
+
+    const password = document.querySelector("[name = 'password']")
+    !password.value && setPasswordInputClick(false)
+
+    const confirmPassword = document.querySelector("[name = 'confirmPassword']")
+    !confirmPassword.value && setConfirmPasswordInputClick(false)
+  }
+
   useEffect(() => {
-    document.addEventListener("click", () => {
-      const name = document.querySelector("[name = 'name']")
-      !name.value && setNameInputClick(false)
-
-      const country = document.querySelector("[name = 'country']")
-      !country.value && setCountryInputClick(false)
-
-      const phoneNumber = document.querySelector("[name = 'phoneNumber']")
-      !phoneNumber.value && setPhoneNumberInputClick(false)
-
-      const email = document.querySelector("[name = 'email']")
-      !email.value && setEmailInputClick(false)
-
-      const address = document.querySelector("[name = 'address']")
-      !address.value && setAddressInputClick(false)
-
-      const password = document.querySelector("[name = 'password']")
-      !password.value && setPasswordInputClick(false)
-
-      const confirmPassword = document.querySelector(
-        "[name = 'confirmPassword']",
-      )
-      !confirmPassword.value && setConfirmPasswordInputClick(false)
-    })
+    document.addEventListener("click", eventHandlerOnDocument)
+    return () => {
+      document.removeEventListener("click", eventHandlerOnDocument)
+    }
   }, [])
 
   return (

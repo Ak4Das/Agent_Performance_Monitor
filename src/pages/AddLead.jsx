@@ -8,7 +8,7 @@ import { addLeadSchema } from "../schema/AddLead.schema.js"
 import Select from "react-select"
 import {
   sourceOptions,
-  agentOptions,
+  getAgentOptions,
   statusOptions,
   tagsOptions,
   priorityOptions,
@@ -26,6 +26,26 @@ export default function AddLead() {
   const [timeToCloseInputClicked, setTimeToCloseInputClick] = useState(false)
   const [priorityInputClicked, setPriorityInputClick] = useState(false)
   const [phoneInputClicked, setPhoneInputClick] = useState(false)
+  const [salesAgents, setSalesAgents] = useState([])
+  const [agentOptions, setAgentOptions] = useState([])
+
+  async function getAgentData() {
+    try {
+      const response = await axios.get("http://localhost:3000/agents")
+      setSalesAgents(response.data)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  useEffect(() => {
+    getAgentData()
+  }, [])
+
+  useEffect(() => {
+    const options = salesAgents.length && getAgentOptions(salesAgents)
+    options && setAgentOptions(options)
+  }, [salesAgents])
 
   const initialValues = {
     name: "",
@@ -89,32 +109,37 @@ export default function AddLead() {
     setFieldTouched,
   } = formik
 
+  function eventHandlerOnDocument() {
+    const name = document.querySelector("[name = 'name']")
+    !name.value && setNameInputClick(false)
+
+    const source = document.querySelector("[name = 'source']")
+    !source.value && setSourceInputClick(false)
+
+    const salesAgent = document.querySelector("[name = 'salesAgent']")
+    !salesAgent.value && setSalesAgentInputClick(false)
+
+    const status = document.querySelector("[name = 'status']")
+    !status.value && setStatusInputClick(false)
+
+    const tags = document.querySelector("[name = 'tags']")
+    !tags.value && setTagsInputClick(false)
+
+    const timeToClose = document.querySelector("[name = 'timeToClose']")
+    !timeToClose.value && setTimeToCloseInputClick(false)
+
+    const priority = document.querySelector("[name = 'priority']")
+    !priority.value && setPriorityInputClick(false)
+
+    const phoneNumber = document.querySelector("[name = 'phoneNumber']")
+    !phoneNumber.value && setPhoneInputClick(false)
+  }
+
   useEffect(() => {
-    document.addEventListener("click", () => {
-      const name = document.querySelector("[name = 'name']")
-      !name.value && setNameInputClick(false)
-
-      const source = document.querySelector("[name = 'source']")
-      !source.value && setSourceInputClick(false)
-
-      const salesAgent = document.querySelector("[name = 'salesAgent']")
-      !salesAgent.value && setSalesAgentInputClick(false)
-
-      const status = document.querySelector("[name = 'status']")
-      !status.value && setStatusInputClick(false)
-
-      const tags = document.querySelector("[name = 'tags']")
-      !tags.value && setTagsInputClick(false)
-
-      const timeToClose = document.querySelector("[name = 'timeToClose']")
-      !timeToClose.value && setTimeToCloseInputClick(false)
-
-      const priority = document.querySelector("[name = 'priority']")
-      !priority.value && setPriorityInputClick(false)
-
-      const phoneNumber = document.querySelector("[name = 'phoneNumber']")
-      !phoneNumber.value && setPhoneInputClick(false)
-    })
+    document.addEventListener("click", eventHandlerOnDocument)
+    return () => {
+      document.removeEventListener("click", eventHandlerOnDocument)
+    }
   }, [])
 
   return (
@@ -214,7 +239,10 @@ export default function AddLead() {
                   setSalesAgentInputClick(true)
                 }}
                 value={
-                  agentOptions.find((opt) => opt.value === values.salesAgent) ||
+                  (agentOptions &&
+                    agentOptions.find(
+                      (opt) => opt.value === values.salesAgent,
+                    )) ||
                   null
                 }
                 onChange={(selected) => {

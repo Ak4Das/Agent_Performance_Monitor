@@ -216,10 +216,10 @@ export default function Team() {
       const performanceScores = await Promise.all(
         salesAgents.map(async (agent) => {
           const performanceScore = await findOverallPerformanceScore(agent._id)
-          agent.performanceScore = Number(performanceScore.toFixed(1))
+          agent.performanceScore = Number(performanceScore.toFixed(1)) || 0
           return {
             id: agent._id,
-            performanceScore: performanceScore.toFixed(1),
+            performanceScore: Number(performanceScore.toFixed(1)) || 0,
           }
         }),
       )
