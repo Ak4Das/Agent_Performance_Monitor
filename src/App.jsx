@@ -8,22 +8,99 @@ import { useTheme } from "styled-components"
 import SideBar from "./components/SideBar.jsx"
 import NavBar from "./components/NavBar.jsx"
 import { barChart, lineChart, pieChart } from "./chart.js"
-import agents from "./agentData.js"
 import { sortArrayByProperty } from "./functions.js"
-
-const sortAgentsByPerformanceScore = sortArrayByProperty(
-  agents,
-  "performanceScore",
-)
+import axios from "axios"
 
 function App() {
   const theme = useTheme()
+  const [newLeadsData, setNewLeadsData] = useState([])
+  const [contactedLeadsData, setContactedLeadsData] = useState([])
+  const [qualifiedLeadsData, setQualifiedLeadsData] = useState([])
+  const [proposalSentLeadsData, setProposalSentLeadsData] = useState([])
+  const [closedLeadsData, setClosedLeadsData] = useState([])
+  const [salesAgent, setSalesAgent] = useState([])
+  const [sortAgentsByPerformanceScore, setSortAgentsByPerformanceScore] =
+    useState([])
+
+  async function getLeadDataByProperty(properties, endDay, setFunction) {
+    try {
+      const propString = JSON.stringify(properties)
+      const response = await axios.get(
+        `http://localhost:3000/leads?minDay=0&maxDay=${endDay}&filters=${propString}`,
+      )
+      setFunction && setFunction(response.data)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function getAgentData() {
+    try {
+      const response = await axios.get("http://localhost:3000/agents")
+      setSalesAgent(response.data)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async function updateSalesAgentsData() {
+    const updatedData = await Promise.all(
+      salesAgent.map(async (agent) => {
+        const assignedLead = await getLeadDataByProperty(
+          { salesAgent: agent._id },
+          360,
+        )
+        const closedLead = await getLeadDataByProperty(
+          { salesAgent: agent._id, status: "Closed" },
+          360,
+        )
+        agent.assignedLead = assignedLead.length
+        agent.closedLead = closedLead.length
+        const performanceScore = Number(
+          ((agent.closedLead / agent.assignedLead) * 10).toFixed(1),
+        )
+        agent.performanceScore = performanceScore
+        return agent
+      }),
+    )
+    const sortAgentsByPerformanceScore = sortArrayByProperty(
+      updatedData,
+      "performanceScore",
+    )
+    setSortAgentsByPerformanceScore(sortAgentsByPerformanceScore)
+  }
 
   useEffect(() => {
+    async function fetch() {
+      await getLeadDataByProperty({ status: "New" }, 30, setNewLeadsData)
+      await getLeadDataByProperty(
+        { status: "Contacted" },
+        30,
+        setContactedLeadsData,
+      )
+      await getLeadDataByProperty(
+        { status: "Qualified" },
+        30,
+        setQualifiedLeadsData,
+      )
+      await getLeadDataByProperty(
+        { status: "Proposal Sent" },
+        30,
+        setProposalSentLeadsData,
+      )
+      await getLeadDataByProperty({ status: "Closed" }, 30, setClosedLeadsData)
+      await getAgentData()
+    }
+    fetch()
     pieChart()
     barChart()
     lineChart()
   }, [])
+
+  useEffect(() => {
+    salesAgent.length && updateSalesAgentsData()
+  }, [salesAgent])
 
   return (
     <>
@@ -39,7 +116,7 @@ function App() {
                     <span>
                       <i className="bi bi-people-fill"></i>
                     </span>
-                    <span>1400</span>
+                    <span>{newLeadsData.length}</span>
                     <span className={`${styles.about}`}>New Lead</span>
                   </div>
                 </div>
@@ -50,7 +127,7 @@ function App() {
                     <span>
                       <i className="bi bi-telephone-outbound-fill"></i>
                     </span>
-                    <span>700</span>
+                    <span>{contactedLeadsData.length}</span>
                     <span className={`${styles.about}`}>Contacted</span>
                   </div>
                 </div>
@@ -61,7 +138,7 @@ function App() {
                     <span>
                       <i className="bi bi-check-square-fill"></i>
                     </span>
-                    <span>200</span>
+                    <span>{qualifiedLeadsData.length}</span>
                     <span className={`${styles.about}`}>Qualified</span>
                   </div>
                 </div>
@@ -70,22 +147,22 @@ function App() {
                 <div className={`${styles.first_row_item_container}`}>
                   <div className={`${styles.first_row_item_content}`}>
                     <span>
-                      <i className="bi bi-lock-fill"></i>
+                      <i className="bi bi-box-seam-fill"></i>
                     </span>
-                    <span>100</span>
-                    <span className={`${styles.about}`}>Closed</span>
+                    <span>{proposalSentLeadsData.length}</span>
+                    <span className={`${styles.about}`}>Proposal Sent</span>
                   </div>
                 </div>
               </div>
               <div className={`${styles.agent_performance_table}`}>
-                <h6>Agents overall performance table</h6>
+                <h6>Agents overall performance table (1 year)</h6>
                 <table className={`table ${styles.table}`}>
                   <thead>
                     <tr>
-                      <th scope="col">id</th>
+                      <th scope="col">code</th>
                       <th scope="col">Agent Name</th>
-                      <th scope="col">New Lead</th>
-                      <th scope="col">Closed</th>
+                      <th scope="col">Assigned Lead</th>
+                      <th scope="col">Closed Lead</th>
                       <th scope="col">Performance Score</th>
                       <th scope="col">Status</th>
                       <th scope="col">Rank</th>
@@ -94,11 +171,11 @@ function App() {
                   <tbody>
                     {sortAgentsByPerformanceScore.map((agent, index) => {
                       return (
-                        <tr key={agent.id}>
-                          <th scope="row">{agent.id}</th>
+                        <tr key={agent.agentCode}>
+                          <th scope="row">{agent.agentCode}</th>
                           <td>{agent.name}</td>
-                          <td>{agent.newLead}</td>
-                          <td>{agent.closed}</td>
+                          <td>{agent.assignedLead}</td>
+                          <td>{agent.closedLead}</td>
                           <td>
                             <span style={{ color: "#70d89d" }}>
                               {agent.performanceScore.toFixed(1)}
